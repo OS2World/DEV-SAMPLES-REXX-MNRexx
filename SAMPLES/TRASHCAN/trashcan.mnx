@@ -1,0 +1,74 @@
+/*** MNRexx Script ***/
+
+context = word(arg(1), 1)
+self = arg(2)
+
+call RxFuncAdd 'RxmnInit', 'MNRexx', 'RxmnInit'
+call RxmnInit
+
+/*** trash can folder name ***/
+
+TrashCanDir = "C:\TRASHCAN"
+
+/*** create if it doesn't exist ***/
+
+"mkdir" TrashCanDir
+
+/*** obtain object handle of the trashcan folder ***/
+
+TrashCan = RxmnQueryObject(TrashCanDir)
+
+/*** setup TrashCan font and style ***/
+
+rc = RxmnSetFldrFont(TrashCan, "8.Helv", OPEN_CONTENTS)
+
+attributes = bitor(bitor(CV_NAME, CV_MINI), CV_FLOW)
+rc = RxmnSetFldrAttr(TrashCan, attributes, OPEN_CONTENTS)
+
+/*** setup trashcan default view ***/
+
+rc = RxmnSetDefaultView(TrashCan, OPEN_CONTENTS)
+
+/*** define menu action IDs ***/
+
+openTrashCan = D2L(0)
+emptyTrashCan = D2L(1)
+
+/*** set default action to 'open trashcan' ***/
+
+rc = RxmnSetDefaultView(self, openTrashCan);
+
+/*** event actions ***/
+
+if context = 'MODIFYMENU' then
+do
+	menu = arg(3)
+
+	rc = RxmnInsertMenuItem(menu, WPMENUID_PRIMARY, openTrashCan, , "Open Trashcan")
+	rc = RxmnInsertMenuItem(menu, WPMENUID_PRIMARY, emptyTrashCan, , "Empty Trashcan")
+end
+else if context = 'MENUSELECT' then
+do
+	itemID = arg(3)
+
+	if itemID = openTrashCan then
+	do
+		rc = RxmnOpenView(TrashCan, OPEN_CONTENTS)
+	end
+	else if itemID = emptyTrashCan then
+	do
+        	rc = RxmnDeleteContents(TrashCan, CONFIRM_DELETE)
+	end
+end
+else if context = 'DROP' then
+do
+	do i = 3 to arg()
+		object = arg(i)
+		rc = RxmnMoveObject(object, TrashCan)
+	end
+end
+
+call RxmnUnInit
+return
+
+

@@ -1,0 +1,100 @@
+/*** MNRexx Script ***/
+
+context = word(arg(1), 1)
+
+if context \= 'DROP' then return
+
+self = arg(2)
+
+call RxFuncAdd 'RxmnInit', 'MNRexx', 'RxmnInit'
+call RxmnInit
+
+do i = 3 to arg()
+	object = arg(i)
+        rc = showinfo(object)
+end
+return
+
+showInfo : procedure expose (MNREXX)
+parse arg object
+
+say "---- object information ----"
+say
+say "Title =" RxmnGetTitle(object)
+say "Handle =" D2X(L2D(object))
+say "ObjectID =" RxmnGetObjectID(object)
+parentFolder = RxmnGetFolder(object)
+say "Parent Folder Handle =" D2X(L2D(parentFolder)) "(" || RxmnGetTitle(parentFolder) || ")"
+
+/*** class hierachy ***/
+
+say
+say "Class Hierachy:"
+say
+class = RxmnGetClassName(object)
+level = ""
+do while class \= ""
+    say level || class
+    class = RxmnGetParent(class)
+	if level = "" then
+		level = "+-"
+	else
+		level = " " || level;
+end
+
+/*** list shadows, if any ***/
+
+rc = RxmnGetShadows(object, "shadow")
+
+say
+say "number of shadows =" shadow.0
+
+do i = 1 to shadow.0
+    say "shadow handle =" D2X(L2D(shadow.i))
+end
+say
+
+/*** object style ***/
+
+/*** class specific information ***/
+
+if RxmnIsA(object, "WPFileSystem") then
+do
+    say "RealName:" RxmnGetRealName(object)
+    say
+end
+
+if RxmnIsA(object, "WPShadow") then
+do
+    shadowedObject = RxmnGetShadowedObject(object)
+
+    say "Shadowed Object Handle:" D2X(L2D(shadowedObject))
+end
+
+if RxmnIsA(object, "WPProgram") | RxmnIsA(object, "WPProgramFile") then
+do
+    exename = RxmnGetProgDetail(object, PROGDETAIL_EXECUTABLE)
+    parameters = RxmnGetProgDetail(object, PROGDETAIL_PARAMETERS)
+    startupdir = RxmnGetProgDetail(object, PROGDETAIL_STARTUPDIR)
+
+    say "exename:" exename
+    say "parameters:" parameters
+    say "startupdir:" startupdir
+end
+
+if RxmnIsA(object, "WPFolder") then
+do
+	rc = RxmnGetContents(object, "content")
+
+	if rc then
+	do
+		do i = 1 to content.0
+			say "contains:" D2X(L2D(content.i)) RxmnGetTitle(content.i)
+		end
+	end
+end
+
+say
+
+return 0
+

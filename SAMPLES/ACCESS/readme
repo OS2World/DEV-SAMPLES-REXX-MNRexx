@@ -1,0 +1,19 @@
+This is a sample showing how to access WPS from an external Rexx script.
+Run the install script and then run 'access.cmd' script file.  The access
+script file shows the list of desktop objects (handle and title).
+
+The install script installs an MNRexx object that acts as an agent to
+access WPS.
+
+The access script first pushes the commands to be executed to a queue
+named 'test', then causes 'SETUP' event by sending the name of the
+queue.
+
+The agent object, on the 'SETUP' event, pulls the commands from the
+queue and executes it (using 'interpret' builtin keyword function).
+As a result of the execution of the queued command, the handle and
+the title of the desktop objects are queued to the queue.
+
+The access script then pulls the results from the queue.
+
+

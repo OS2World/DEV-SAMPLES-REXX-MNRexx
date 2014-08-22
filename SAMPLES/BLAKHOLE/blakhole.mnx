@@ -1,0 +1,45 @@
+/*** MNRexx Script Sample : blackhole ***/
+
+context = word(arg(1), 1)
+
+/*** handles DROP event only ***/
+
+if context \= 'DROP' then return
+
+self = arg(2)
+
+call RxFuncAdd 'RxmnInit', 'MNRexx', 'RxmnInit'
+call RxmnInit
+
+if context = 'DROP' then
+do
+	/*** action on objects = arg(3), arg(4), ... arg(arg()) ***/
+
+	do i = 3 to arg()
+		object = arg(i)
+		originalStyle = RxmnGetStyle(object)
+
+		/*** set it deletable ***/
+
+		newstyle = bitxor(style, OBJSTYLE_NODELETE)
+		rc = RxmnSetStyle(object, newstyle)
+
+		/*** now delete it ***/
+
+		if RxmnIsA(object, "WPFolder") then
+			rc = RxmnDelete(object, CONFIRM_DELETEFOLDER)
+		else
+			rc = RxmnDelete(object, CONFIRM_DELETE)
+
+		/*** reset the style if cancelled ***/
+
+		if rc \= OK_DELETE then
+		do
+			rc = RxmnSetStyle(object, originalStyle)
+		end								
+	end
+end
+
+call RxmnUnInit
+return
+

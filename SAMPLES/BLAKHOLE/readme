@@ -1,0 +1,15 @@
+This is a sample demonstrating how to change a dropped object's style.
+
+The script does the following:
+
+    for each dropped object,
+
+        - sets the object deletable if not (i.e., if OBJECT_NODELETE style
+        is set;
+
+        - delete the object with confirmation
+
+        - if the user cancels the delete operation, resets the style flag
+        to the original
+
+

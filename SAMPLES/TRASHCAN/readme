@@ -1,0 +1,10 @@
+This is a simple 'trashcan' object - dropped objects are moved to a trashcan
+folder which you can open or clean up later.
+
+The object's menu has 'open trashcan' and 'empty trashcan' entries - the
+default is set to 'open trashcan' (so you can double-click on the object
+to see the content of the trashcan folder).
+
+The trashcan folder's default view is set to the icon view (OPEN_CONTENTS)
+in flowed/mini-icon mode.  The font is set to 8-pt Helv.
+

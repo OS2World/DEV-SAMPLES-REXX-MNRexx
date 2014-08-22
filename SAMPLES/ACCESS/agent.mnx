@@ -1,0 +1,36 @@
+/*** MNRexx sample : WPS Access agent ***/
+
+context = word(arg(1), 1)
+self = arg(2)
+
+if context \= 'SETUP' then return
+
+/*** execution on setup ***/
+
+setupString = arg(3)
+
+call RxFuncAdd 'RxmnInit', 'MNRexx', 'RxmnInit'
+call RxmnInit
+
+queueName = RxmnGetSetupString(self, setupString, "MNREXXQUEUE")
+
+if queueName \= "" then
+do
+    currentQueue = RxQueue('Set', queueName)
+
+    command = "";
+
+    do while queued() \= 0
+        pull line
+        command = command || line || ";"    /*** use semi-colon as a separator ***/
+    end
+
+    interpret command
+
+    rc = RxQueue('Set', currentQueue)
+end
+
+call RxmnUnInit
+return
+
+
